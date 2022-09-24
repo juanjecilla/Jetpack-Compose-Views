@@ -1,4 +1,5 @@
 <resources>
     <string name="app_name">Jetpack ComposeViews</string>
     <string name="detail_placeholder">Hello</string>
+    <string name="search_bar_placeholder">Search...</string>
 </resources>
