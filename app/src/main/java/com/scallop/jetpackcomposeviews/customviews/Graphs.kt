@@ -1,14 +1,17 @@
 package com.scallop.jetpackcomposeviews.customviews
 
 import android.graphics.Paint
+import android.widget.Toast
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -63,7 +66,8 @@ fun CustomGraph() {
         dataList.forEachIndexed { index, value ->
 
             floatValue.add(index = index,
-                element = value.toFloat() / dataList.maxOf { it }.toFloat())
+                element = value.toFloat() / dataList.maxOf { it }.toFloat()
+            )
 
         }
 
@@ -154,9 +158,11 @@ fun BarGraph(
             horizontalAlignment = CenterHorizontally
         ) {
 
-            Canvas(modifier = Modifier
-                .padding(bottom = 10.dp)
-                .fillMaxSize()) {
+            Canvas(
+                modifier = Modifier
+                    .padding(bottom = 10.dp)
+                    .fillMaxSize()
+            ) {
 
                 // Y-Axis Scale Text
                 val yAxisScaleText = (barData.maxOf { it }) / 3f
@@ -182,9 +188,63 @@ fun BarGraph(
                         pathEffect = pathEffect
                     )
                 }
+            }
+        }
+    }
+}
+
+@Composable
+fun CustomChart(
+    barValue: List<Float>,
+    xAxisScale: List<String>,
+    total_amount: Int,
+) {
+    val context = LocalContext.current
+    // BarGraph Dimensions
+    val barGraphHeight by remember { mutableStateOf(200.dp) }
+    val barGraphWidth by remember { mutableStateOf(20.dp) }
+    // Scale Dimensions
+    val scaleYAxisWidth by remember { mutableStateOf(50.dp) }
+    val scaleLineWidth by remember { mutableStateOf(2.dp) }
+
+    Column(
+        modifier = Modifier
+            .padding(50.dp)
+            .fillMaxSize(),
+        verticalArrangement = Arrangement.Top
+    ) {
+
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(barGraphHeight),
+            verticalAlignment = Alignment.Bottom,
+            horizontalArrangement = Arrangement.Start
+        ) {
+            // scale Y-Axis
+            Box(
+                modifier = Modifier
+                    .fillMaxHeight()
+                    .width(scaleYAxisWidth),
+                contentAlignment = Alignment.BottomCenter
+            ) {
+                Column(
+                    modifier = Modifier.fillMaxHeight(),
+                    verticalArrangement = Arrangement.Bottom
+                ) {
+                    Text(text = total_amount.toString())
+                    Spacer(modifier = Modifier.fillMaxHeight())
+                }
+
+                Column(
+                    modifier = Modifier.fillMaxHeight(),
+                    verticalArrangement = Arrangement.Bottom
+                ) {
+                    Text(text = (total_amount / 2).toString())
+                    Spacer(modifier = Modifier.fillMaxHeight(0.5f))
+                }
 
             }
-
         }
 
         // Layer 2
@@ -307,4 +367,58 @@ fun BarGraph(
 
         }
     }
+    // Y-Axis Line
+    Box(
+        modifier = Modifier
+            .fillMaxHeight()
+            .width(scaleLineWidth)
+            .background(Color.Black)
+    )
+
+    // graph
+    barValue.forEach {
+        Box(
+            modifier = Modifier
+                .padding(start = barGraphWidth, bottom = 5.dp)
+                .clip(CircleShape)
+                .width(barGraphWidth)
+                .fillMaxHeight(it)
+                .background(Purple500)
+                .clickable {
+                    Toast
+                        .makeText(context, it.toString(), Toast.LENGTH_SHORT)
+                        .show()
+                }
+        )
+    }
+
+}
+
+// X-Axis Line
+Box(
+modifier = Modifier
+.fillMaxWidth()
+.height(scaleLineWidth)
+.background(Color.Black)
+)
+
+// Scale X-Axis
+Row(
+modifier = Modifier
+.padding(start = scaleYAxisWidth + barGraphWidth + scaleLineWidth)
+.fillMaxWidth(),
+horizontalArrangement = Arrangement.spacedBy(barGraphWidth)
+) {
+
+    xAxisScale.forEach {
+        Text(
+            modifier = Modifier.width(barGraphWidth),
+            text = it,
+            textAlign = TextAlign.Center
+        )
+    }
+
+}
+
+}
 }
