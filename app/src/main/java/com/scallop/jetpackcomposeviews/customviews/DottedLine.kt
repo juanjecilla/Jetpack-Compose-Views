@@ -11,7 +11,6 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.LayoutDirection
 import kotlin.math.roundToInt
 
-
 // https://medium.com/@onurugur.prf/jetpack-compose-dotted-shape-c9b84d1ce56f
 data class DottedShape(
     val step: Dp,

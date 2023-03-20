@@ -22,7 +22,6 @@ import androidx.constraintlayout.compose.Dimension
 import androidx.constraintlayout.compose.ExperimentalMotionApi
 import androidx.constraintlayout.compose.MotionLayout
 
-
 // https://medium.com/@iamgideon/motion-layout-appbar-in-jetpack-compose-441d882ff2a8
 
 private enum class MotionLayoutAppBarItem {

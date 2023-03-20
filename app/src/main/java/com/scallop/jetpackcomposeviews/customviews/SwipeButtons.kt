@@ -167,7 +167,7 @@ fun SwipeIndicator(
                 ratio = 1.0F,
                 matchHeightConstraintsFirst = true,
             )
-            .background(Color.White),
+            .background(White),
     ) {
         Icon(
             imageVector = Icons.Rounded.Done,

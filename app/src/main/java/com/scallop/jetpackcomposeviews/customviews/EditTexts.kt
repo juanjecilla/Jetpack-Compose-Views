@@ -11,16 +11,18 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.platform.LocalFontLoader
+import androidx.compose.ui.platform.LocalFontFamilyResolver
 import androidx.compose.ui.text.Paragraph
 import androidx.compose.ui.text.ParagraphIntrinsics
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.font.createFontFamilyResolver
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import kotlin.math.ceil
 
 //https://medium.com/@banmarkovic/autosize-textfield-in-android-jetpack-compose-7d2a601636f5
 
@@ -98,10 +100,10 @@ fun AutoSizableTextField(
             Paragraph(
                 text = value,
                 style = TextStyle(fontSize = nFontSize),
+                Constraints(maxWidth = ceil(with(LocalDensity.current) { maxWidth.toPx() }).toInt()),
                 density = LocalDensity.current,
-                resourceLoader = LocalFontLoader.current,
-                maxLines = maxLines,
-                width = with(LocalDensity.current) { maxWidth.toPx() }
+                fontFamilyResolver = LocalFontFamilyResolver.current,
+                maxLines = maxLines
             )
         }
 

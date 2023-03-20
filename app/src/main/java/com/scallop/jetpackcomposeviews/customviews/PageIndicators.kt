@@ -18,7 +18,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 
-
 //https://abhimanyu14.medium.com/page-indicator-with-jetpack-compose-using-canvas-and-animations-a851ea4cf749
 @Composable
 fun PageIndicatorView(
