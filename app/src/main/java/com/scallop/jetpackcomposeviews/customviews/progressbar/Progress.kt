@@ -1,4 +1,4 @@
-package com.scallop.jetpackcomposeviews.customviews
+package com.scallop.jetpackcomposeviews.customviews.progressbar
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
