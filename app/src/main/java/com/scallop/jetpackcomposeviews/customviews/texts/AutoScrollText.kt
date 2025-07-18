@@ -17,35 +17,41 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.datasource.LoremIpsum
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.isActive
+import kotlin.time.Duration
+import kotlin.time.Duration.Companion.seconds
 
 /**
- * https://medium.com/@paritasampa95/auto-scrolling-text-in-jetpack-compose-smooth-horizontal-marquee-for-android-60b20f1e8198#bypass
-
+ * Original code: https://medium.com/@paritasampa95/auto-scrolling-text-in-jetpack-compose-smooth-horizontal-marquee-for-android-60b20f1e8198
  */
 @Composable
-fun AutoScrollText(text: String, modifier: Modifier = Modifier) {
+fun AutoScrollText(
+    text: String,
+    scrollDuration: Duration = 1.seconds,
+    initialDelay: Duration = 1.seconds,
+    endDelay: Duration = 1.seconds,
+    modifier: Modifier = Modifier,
+) {
     val scrollState = rememberScrollState()
 
     LaunchedEffect(text) {
+        delay(initialDelay)
         while (true) {
-            scrollState.scrollTo(0) // Reset to start
+            scrollState.scrollTo(0)
             scrollState.animateScrollTo(
                 scrollState.maxValue,
                 animationSpec = tween(
-                    durationMillis = 10000, // Adjust speed
+                    durationMillis = scrollDuration.inWholeMilliseconds.toInt(),
                     easing = LinearEasing
                 )
             )
-            delay(500) // Optional pause at the end
+            delay(endDelay)
         }
     }
 
     Row(
         modifier = modifier
-            .horizontalScroll(scrollState)
-            .fillMaxWidth()
-            .height(40.dp),
-        verticalAlignment = Alignment.CenterVertically
+            .horizontalScroll(scrollState),
     ) {
         Text(
             text = text,
@@ -56,7 +62,7 @@ fun AutoScrollText(text: String, modifier: Modifier = Modifier) {
     }
 }
 
-@Preview(showBackground = true)
+@Preview(showBackground = true, showSystemUi = true)
 @Composable
 private fun AutoScrollText_Preview() {
     AutoScrollText(LoremIpsum().values.joinToString(" "))
