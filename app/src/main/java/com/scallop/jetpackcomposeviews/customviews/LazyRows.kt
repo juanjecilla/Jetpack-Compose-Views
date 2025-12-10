@@ -44,7 +44,7 @@ fun <T : Any> AutoScrollingLazyRow(
         itemsIndexed(
             items, key = { _, item -> item.id }
         ) { index, item ->
-            itemContent(item = item.data)
+            itemContent(item.data)
 
             if (index == items.lastIndex) {
                 val currentList = items

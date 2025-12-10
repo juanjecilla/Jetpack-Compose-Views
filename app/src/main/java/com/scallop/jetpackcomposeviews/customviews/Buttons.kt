@@ -360,7 +360,7 @@ fun ButtonAnimation(
     scaleDown: Float = 0.9f
 ) {
 
-    val interactionSource = MutableInteractionSource()
+    val interactionSource = remember { MutableInteractionSource() }
 
     val coroutineScope = rememberCoroutineScope()
 
@@ -401,7 +401,7 @@ fun ButtonAnimation(
 @Composable
 fun HeartAnimation() {
 
-    val interactionSource = MutableInteractionSource()
+    val interactionSource = remember { MutableInteractionSource() }
 
     val coroutineScope = rememberCoroutineScope()
 
@@ -545,7 +545,7 @@ fun ButtonNoRipple(
 ) {
 
     // To disable ripple effect
-    val interactionSource = MutableInteractionSource()
+    val interactionSource = remember { MutableInteractionSource() }
 
     Box(
         modifier = Modifier
