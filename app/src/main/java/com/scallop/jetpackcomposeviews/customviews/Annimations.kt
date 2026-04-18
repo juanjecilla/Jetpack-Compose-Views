@@ -14,6 +14,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalDensity
 
 data class Star(
     var x: Float,
@@ -48,8 +49,9 @@ fun Space(
             .fillMaxWidth()
             .fillMaxHeight(),
     ) {
-        val width = maxWidth.toPx()
-        val height = maxHeight.toPx()
+        val density = LocalDensity.current
+        val width = with(density) { maxWidth.toPx() }
+        val height = with(density) { maxHeight.toPx() }
         val stars = remember {
             buildList {
                 repeat(1000) {
