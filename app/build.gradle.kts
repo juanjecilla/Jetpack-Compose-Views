@@ -53,6 +53,7 @@ dependencies {
     implementation("androidx.compose.material:material-icons-extended:1.1.0-alpha08")
     implementation(libs.androidx.ui.graphics)
     implementation(libs.androidx.ui.tooling.preview)
+    debugImplementation(libs.androidx.ui.tooling)
     implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.6.0")
     implementation("androidx.activity:activity-compose:1.6.1")
     implementation("androidx.compose.material3:material3:1.1.0-alpha08")
