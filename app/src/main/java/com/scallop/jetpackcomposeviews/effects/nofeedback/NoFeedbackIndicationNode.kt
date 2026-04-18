@@ -14,7 +14,7 @@ import androidx.compose.ui.node.DrawModifierNode
  *
  * Original code: https://narendranathchatterjee.medium.com/disabling-click-indications-app-wide-in-jetpack-compose-4a7b39f900f4
  */
-private class NoFeedbackIndicationNode(
+class NoFeedbackIndicationNode(
     private val interactionSource: InteractionSource
 ) : Modifier.Node(), DrawModifierNode {
     override fun ContentDrawScope.draw() {
