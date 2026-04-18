@@ -13,9 +13,12 @@ import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.PathEffect
+import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import java.time.Duration
 import java.time.Instant
 import java.time.LocalDateTime
 import java.time.ZoneId
@@ -28,10 +31,10 @@ import java.time.format.DateTimeFormatter
  */
 
 enum class SleepStage(val level: Int, val color: Color, val displayName: String) {
-    AWAKE(0, Color(0xFFFFCC00), "Awake"),
-    REM(1, Color(0xFF42A5F5), "REM"),
-    LIGHT(2, Color(0xFF26C6DA), "Light"),
-    DEEP(3, Color(0xFF5C6BC0), "Deep")
+    AWAKE(0, Color(0xFFD4A056), "Awake"),
+    REM(1, Color(0xFF9575CD), "REM"),
+    LIGHT(2, Color(0xFF5E35B1), "Light"),
+    DEEP(3, Color(0xFF1A237E), "Deep")
 }
 
 data class SleepPeriod(
@@ -51,33 +54,93 @@ fun SleepGraph(
     val maxTime = periods.maxOf { it.endTime }
     val duration = maxTime - minTime
 
+    val stages = SleepStage.values()
+
     Column(modifier = modifier.padding(16.dp)) {
-        Canvas(
+        Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(200.dp)
+                .height(250.dp)
         ) {
-            val width = size.width
-            val height = size.height
-            val stepHeight = height / 4
-            val cornerRadius = 4.dp.toPx()
+            // Stage Labels
+            Column(
+                modifier = Modifier.fillMaxHeight(),
+                verticalArrangement = Arrangement.SpaceBetween
+            ) {
+                stages.forEach { stage ->
+                    val stageDuration = periods
+                        .filter { it.stage == stage }
+                        .sumOf { it.endTime - it.startTime }
+                    val durationText = formatDuration(stageDuration)
+                    
+                    Text(
+                        text = "${stage.displayName} • $durationText",
+                        style = MaterialTheme.typography.labelLarge,
+                        color = Color.Black
+                    )
+                    if (stage != stages.last()) {
+                        Spacer(modifier = Modifier.weight(1f))
+                    }
+                }
+            }
 
-            periods.forEach { period ->
-                val left = ((period.startTime - minTime).toFloat() / duration) * width
-                val right = ((period.endTime - minTime).toFloat() / duration) * width
-                val top = period.stage.level * stepHeight
-                val rectWidth = right - left
+            Canvas(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(top = 24.dp, bottom = 12.dp) // Adjust for labels
+            ) {
+                val width = size.width
+                val height = size.height
+                val stepHeight = height / (stages.size - 1)
+                val cornerRadius = 6.dp.toPx()
+                val barHeight = 12.dp.toPx()
 
-                drawRoundRect(
-                    color = period.stage.color,
-                    topLeft = Offset(left, top + 10f), // Small padding
-                    size = Size(rectWidth, stepHeight - 20f),
-                    cornerRadius = CornerRadius(cornerRadius, cornerRadius)
-                )
+                // Draw horizontal background lines
+                stages.forEachIndexed { index, _ ->
+                    val y = index * stepHeight
+                    drawLine(
+                        color = Color.LightGray.copy(alpha = 0.5f),
+                        start = Offset(0f, y),
+                        end = Offset(width, y),
+                        strokeWidth = 2.dp.toPx()
+                    )
+                }
+
+                // Draw vertical connectors and periods
+                periods.forEachIndexed { index, period ->
+                    val left = ((period.startTime - minTime).toFloat() / duration) * width
+                    val right = ((period.endTime - minTime).toFloat() / duration) * width
+                    val y = period.stage.level * stepHeight
+                    val rectWidth = (right - left).coerceAtLeast(4.dp.toPx())
+
+                    // Draw the period bar
+                    drawRoundRect(
+                        color = period.stage.color,
+                        topLeft = Offset(left, y - barHeight / 2),
+                        size = Size(rectWidth, barHeight),
+                        cornerRadius = CornerRadius(cornerRadius, cornerRadius)
+                    )
+
+                    // Draw vertical connector to next period
+                    if (index < periods.size - 1) {
+                        val nextPeriod = periods[index + 1]
+                        val nextY = nextPeriod.stage.level * stepHeight
+                        
+                        if (y != nextY) {
+                            drawLine(
+                                color = period.stage.color.copy(alpha = 0.6f),
+                                start = Offset(right, y),
+                                end = Offset(right, nextY),
+                                strokeWidth = 1.dp.toPx(),
+                                pathEffect = PathEffect.dashPathEffect(floatArrayOf(10f, 10f), 0f)
+                            )
+                        }
+                    }
+                }
             }
         }
 
-        Spacer(modifier = Modifier.height(8.dp))
+        Spacer(modifier = Modifier.height(16.dp))
 
         // Time labels
         Row(
@@ -89,38 +152,27 @@ fun SleepGraph(
                 style = MaterialTheme.typography.bodySmall,
                 color = Color.Gray
             )
+            // Mid time if possible
+            val midTime = minTime + (maxTime - minTime) / 2
+            Text(
+                text = formatTime(midTime),
+                style = MaterialTheme.typography.bodySmall,
+                color = Color.Gray
+            )
             Text(
                 text = formatTime(maxTime),
                 style = MaterialTheme.typography.bodySmall,
                 color = Color.Gray
             )
         }
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        // Legend
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceEvenly
-        ) {
-            SleepStage.values().forEach { stage ->
-                LegendItem(stage)
-            }
-        }
     }
 }
 
-@Composable
-private fun LegendItem(stage: SleepStage) {
-    Row(verticalAlignment = Alignment.CenterVertically) {
-        Box(
-            modifier = Modifier
-                .size(12.dp)
-                .background(stage.color, RoundedCornerShape(2.dp))
-        )
-        Spacer(modifier = Modifier.width(4.dp))
-        Text(text = stage.displayName, fontSize = 12.sp)
-    }
+private fun formatDuration(millis: Long): String {
+    val duration = Duration.ofMillis(millis)
+    val hours = duration.toHours()
+    val minutes = duration.toMinutes() % 60
+    return if (hours > 0) "${hours}h ${minutes}m" else "${minutes}m"
 }
 
 private fun formatTime(timestamp: Long): String {
@@ -134,13 +186,15 @@ private fun formatTime(timestamp: Long): String {
 fun SleepGraphPreview() {
     val startTime = System.currentTimeMillis() - 8 * 3600 * 1000
     val periods = listOf(
-        SleepPeriod(startTime, startTime + 30 * 60000, SleepStage.AWAKE),
-        SleepPeriod(startTime + 30 * 60000, startTime + 120 * 60000, SleepStage.LIGHT),
-        SleepPeriod(startTime + 120 * 60000, startTime + 180 * 60000, SleepStage.DEEP),
-        SleepPeriod(startTime + 180 * 60000, startTime + 240 * 60000, SleepStage.REM),
-        SleepPeriod(startTime + 240 * 60000, startTime + 300 * 60000, SleepStage.LIGHT),
-        SleepPeriod(startTime + 300 * 60000, startTime + 360 * 60000, SleepStage.DEEP),
-        SleepPeriod(startTime + 360 * 60000, startTime + 420 * 60000, SleepStage.REM),
+        SleepPeriod(startTime, startTime + 20 * 60000, SleepStage.AWAKE),
+        SleepPeriod(startTime + 20 * 60000, startTime + 25 * 60000, SleepStage.AWAKE),
+        SleepPeriod(startTime + 25 * 60000, startTime + 60 * 60000, SleepStage.REM),
+        SleepPeriod(startTime + 60 * 60000, startTime + 180 * 60000, SleepStage.LIGHT),
+        SleepPeriod(startTime + 180 * 60000, startTime + 220 * 60000, SleepStage.DEEP),
+        SleepPeriod(startTime + 220 * 60000, startTime + 260 * 60000, SleepStage.LIGHT),
+        SleepPeriod(startTime + 260 * 60000, startTime + 300 * 60000, SleepStage.REM),
+        SleepPeriod(startTime + 300 * 60000, startTime + 380 * 60000, SleepStage.DEEP),
+        SleepPeriod(startTime + 380 * 60000, startTime + 420 * 60000, SleepStage.LIGHT),
         SleepPeriod(startTime + 420 * 60000, startTime + 480 * 60000, SleepStage.AWAKE)
     )
 
