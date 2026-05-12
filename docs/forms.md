@@ -1,5 +1,24 @@
 # Forms & Input
 
+## OutlinedUrlTextField
+**File:** `customviews/texts/UrlTextField.kt`
+
+A custom `OutlinedTextField` that automatically detects and highlights URLs. It supports two modes:
+- **Editable:** Highlights URLs as you type using `VisualTransformation`.
+- **Read-only/Disabled:** Uses `LinkAnnotation` to make URLs interactive and clickable even when the field is not editable.
+
+```kotlin
+var text by remember { mutableStateOf("Visit https://google.com") }
+OutlinedUrlTextField(
+    value = text,
+    onValueChange = { text = it },
+    onUrlClick = { url -> /* handle click */ },
+    label = { Text("URL Field") }
+)
+```
+
+---
+
 ## AppTextField
 **File:** `customviews/Forms.kt`
 

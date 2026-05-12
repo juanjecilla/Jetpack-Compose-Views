@@ -26,6 +26,7 @@ import androidx.compose.ui.unit.dp
 import com.scallop.jetpackcomposeviews.customviews.AppTextField
 import com.scallop.jetpackcomposeviews.customviews.MySearchBar
 import com.scallop.jetpackcomposeviews.customviews.texts.DebouncedTextField
+import com.scallop.jetpackcomposeviews.customviews.texts.OutlinedUrlTextField
 import com.scallop.jetpackcomposeviews.showcase.ShowcaseSection
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -48,6 +49,41 @@ fun FormsShowcaseScreen(onBack: () -> Unit) {
             verticalArrangement = Arrangement.spacedBy(24.dp),
             modifier = Modifier.padding(padding)
         ) {
+            item {
+                ShowcaseSection(title = "OutlinedUrlTextField — highlights URLs and makes them clickable") {
+                    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                        var text by remember { mutableStateOf("Check out https://proandroiddev.com for more!") }
+                        var lastClickedUrl by remember { mutableStateOf("") }
+                        
+                        OutlinedUrlTextField(
+                            value = text,
+                            onValueChange = { text = it },
+                            onUrlClick = { lastClickedUrl = it },
+                            label = { Text("URL Field") },
+                            modifier = Modifier.fillMaxWidth()
+                        )
+                        
+                        if (lastClickedUrl.isNotEmpty()) {
+                            Text(
+                                text = "Last clicked: $lastClickedUrl",
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.primary
+                            )
+                        }
+
+                        var readOnlyText by remember { mutableStateOf("Read-only with links: https://google.com") }
+                        OutlinedUrlTextField(
+                            value = readOnlyText,
+                            onValueChange = { readOnlyText = it },
+                            onUrlClick = { lastClickedUrl = it },
+                            label = { Text("Read-Only URL Field") },
+                            readOnly = true,
+                            modifier = Modifier.fillMaxWidth()
+                        )
+                    }
+                }
+            }
+
             item {
                 ShowcaseSection(title = "AppTextField — outlined text field") {
                     var text by remember { mutableStateOf("") }
